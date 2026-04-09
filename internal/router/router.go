@@ -1,12 +1,13 @@
 package router
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	productshandler "github.com/l10-bhushan/ecom_project/internal/handlers/products"
+	"github.com/l10-bhushan/ecom_project/internal/services/products"
 )
 
 // DbConfig would store the database connection string
@@ -30,10 +31,13 @@ type Application struct {
 // Mount will help us mount all the routes for our api
 func (app *Application) Mount() http.Handler {
 	router := chi.NewRouter()
+	service := products.NewService()
+	handler := productshandler.NewHandler(service)
 
 	router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(w, "Server is healthy", http.StatusOK)
+		w.Write([]byte("Server is healthy"))
 	})
+	router.Get("/products", handler.GetAllProducts)
 
 	return router
 }
